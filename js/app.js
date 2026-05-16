@@ -1,3 +1,9 @@
+const STATIONS = [
+  { id: "8665530", name: "Charleston Harbor, SC" },
+  { id: "8661070", name: "Myrtle Beach, SC" },
+  { id: "8670870", name: "Savannah, GA" }
+];
+
 const loadBtn = document.getElementById("loadBtn");
 const stationSelect = document.getElementById("stationSelect");
 const predictionTableBody =
@@ -150,6 +156,18 @@ async function loadTides() {
   }
 }
 
+function populateStations() {
+  const select = document.getElementById("stationSelect");
+
+  STATIONS.forEach((station) => {
+    const option = document.createElement("option");
+    option.value = station.id;
+    option.textContent = station.name;
+    select.appendChild(option);
+  });
+  select.value = "8665530";
+}
+
 function drawChart(labels, predicted, measured) {
   const ctx = document.getElementById("tideChart");
 
@@ -200,3 +218,4 @@ function drawChart(labels, predicted, measured) {
 
 loadBtn.addEventListener("click", loadTides);
 stationSelect.addEventListener("change", loadTides);
+populateStations();
