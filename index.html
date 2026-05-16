@@ -1,107 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tide Monitor</title>
-    <!-- iOS Home Screen Capability -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <style>
-        :root { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --accent: #4caf50; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 100%; max-width: 350px; box-sizing: border-box; }
-        h1 { font-size: 1.5rem; margin-top: 0; text-align: center; }
-        label { display: block; margin: 10px 0 5px; font-size: 0.9rem; color: #aaa; }
-        input, select, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #2a2a2a; color: #fff; font-size: 1rem; box-sizing: border-box; }
-        button { background: var(--accent); border: none; font-weight: bold; cursor: pointer; margin-bottom: 0; }
-        #output { margin-top: 20px; width: 100%; max-width: 350px; }
-        .data-point { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; }
-        .time { font-size: 0.85rem; color: #aaa; }
-        .val { font-weight: bold; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Charleston Tides</title>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+  <div class="container">
+    <h1>Charleston Tide Predictions</h1>
 
-    <div class="card">
-        <h1>NOAA Tide Monitor</h1>
-        <label for="station">Station ID</label>
-        <input type="text" id="station" value="8665530" placeholder="e.g., 8665530">
+    <button id="loadBtn">Load Today's Tides</button>
 
-        <label for="datum">Datum</label>
-        <select id="datum">
-            <option value="MLLW">MLLW</option>
-            <option value="MHW">MHW</option>
-        </select>
+    <div id="status"></div>
 
-        <button onclick="fetchTides()">Get Recent Data</button>
-    </div>
+    <canvas id="tideChart"></canvas>
 
-    <div id="output"></div>
+    <table id="tideTable">
+      <thead>
+        <tr>
+          <th>Time</th>
+          <th>Height (ft)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-    <script>
-        // Global wrapper to handle the NOAA JSONP data injection
-        window.handleNoaaData = function(data) {
-            const outputDiv = document.getElementById('output');
-            
-            if (!data || !data.data) {
-                outputDiv.innerHTML = `<div class="card" style="border-left: 4px solid #f44336;">Error: ${data?.error?.message || 'No data returned'}</div>`;
-                cleanupScript();
-                return;
-            }
-            
-            outputDiv.innerHTML = '';
-            // Display the 5 most recent tide observations
-            data.data.slice(-5).reverse().forEach(obs => {
-                const item = document.createElement('div');
-                item.className = 'data-point';
-                item.innerHTML = `
-                    <span class="time">${obs.t}</span>
-                    <span class="val">${obs.v} ft</span>
-                `;
-                outputDiv.appendChild(item);
-            });
-            
-            cleanupScript();
-        };
-
-        function cleanupScript() {
-            const oldScript = document.getElementById('noaa-jsonp-script');
-            if (oldScript) oldScript.remove();
-        }
-
-        function fetchTides() {
-            const station = document.getElementById('station').value;
-            const datum = document.getElementById('datum').value;
-            const outputDiv = document.getElementById('output');
-            outputDiv.innerHTML = 'Loading...';
-
-            // Calculate dates for past 24 hours
-            const now = new Date();
-            const past = new Date(now.getTime() - (24 * 60 * 60 * 1000));
-            
-            const formatDate = (d) => d.toISOString().slice(0,10).replace(/-/g, '');
-            const begin = formatDate(past);
-            const end = formatDate(now);
-
-            // Clean up any lingering script elements from past clicks
-            cleanupScript();
-
-            // Construct URL using &callback= window function instead of standard fetch
-            const url = `https://noaa.gov{begin}&end_date=${end}&datum=${datum}&station=${station}&units=english&time_zone=lst_ldt&application=MobileHTMLApp&format=json&callback=handleNoaaData`;
-
-            // Inject script tag directly to bypass client-side CORS errors
-            const script = document.createElement('script');
-            script.id = 'noaa-jsonp-script';
-            script.src = url;
-            script.onerror = function() {
-                outputDiv.innerHTML = '<div class="card" style="border-left: 4px solid #f44336;">Error: Failed to reach NOAA servers. Check connection.</div>';
-            };
-            
-            document.body.appendChild(script);
-        }
-    </script>
-
-
+  <script src="app.js"></script>
 </body>
 </html>
