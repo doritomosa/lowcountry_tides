@@ -4,8 +4,12 @@ const STATIONS = [
   { id: "8670870", name: "Savannah, GA" }
 ];
 
+// ====================
+// DOM ELEMENTS
+// ====================
 const loadBtn = document.getElementById("loadBtn");
 const stationSelect = document.getElementById("stationSelect");
+
 const predictionTableBody =
   document.querySelector("#predictionTable tbody");
 
@@ -14,10 +18,19 @@ const observedTableBody =
 
 const diagnosticsDiv =
   document.getElementById("diagnostics");
-  const statusDiv = document.getElementById("status");
 
+const statusDiv =
+  document.getElementById("status");
+
+// ====================
+// STATE
+// ====================
 let tideChart = null;
+let currentRequestId = 0;
 
+// ====================
+// UTILITIES
+// ====================
 function getTodayDate() {
   const now = new Date();
 
@@ -31,9 +44,7 @@ function getTodayDate() {
 function clearDisplay() {
   predictionTableBody.innerHTML = "";
   observedTableBody.innerHTML = "";
-
-  diagnosticsDiv.innerHTML =
-    "No diagnostics available.";
+  diagnosticsDiv.innerHTML = "No diagnostics available.";
 
   if (tideChart) {
     tideChart.destroy();
@@ -41,9 +52,14 @@ function clearDisplay() {
   }
 }
 
+// ====================
+// DATA + UI
+// ====================
 async function loadTides() {
   clearDisplay();
   statusDiv.textContent = "Loading...";
+
+  const requestId = ++currentRequestId;
 
   const today = getTodayDate();
   const station = stationSelect.value;
@@ -86,43 +102,63 @@ async function loadTides() {
     const predictionData = await predictionResponse.json();
     const waterLevelData = await waterLevelResponse.json();
 
+    // prevent stale renders
+    if (requestId !== currentRequestId) return;
+
     statusDiv.textContent = "";
 
-    // predicted tide
+    if (!predictionData.predictions || !waterLevelData.data) {
+      statusDiv.textContent =
+        "No data returned from NOAA for this station.";
+      return;
+    }
+
     const predictionLabels = [];
     const predictionHeights = [];
+    const measuredHeights = [];
 
+    // ====================
+    // PREDICTIONS
+    // ====================
     predictionData.predictions.forEach((p) => {
       const time = p.t.split(" ")[1];
 
       predictionLabels.push(time);
       predictionHeights.push(parseFloat(p.v));
 
-    const row = document.createElement("tr");
-
-    row.innerHTML = `
-      <td>${p.t}</td>
-      <td>${p.v}</td>
-    `;
-
-    predictionTableBody.appendChild(row);
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${p.t}</td>
+        <td>${p.v}</td>
+      `;
+      predictionTableBody.appendChild(row);
     });
 
-    // actual measured water level
-    const measuredHeights = [];
-
+    // ====================
+    // OBSERVATIONS
+    // ====================
     waterLevelData.data.forEach((d) => {
       measuredHeights.push(parseFloat(d.v));
 
       const row = document.createElement("tr");
-
       row.innerHTML = `
         <td>${d.t}</td>
         <td>${d.v}</td>
       `;
-
       observedTableBody.appendChild(row);
     });
+
+    // ====================
+    // SAFETY CHECKS
+    // ====================
+    if (
+      predictionHeights.length === 0 ||
+      measuredHeights.length === 0
+    ) {
+      diagnosticsDiv.innerHTML =
+        "<p>No diagnostics available.</p>";
+      return;
+    }
 
     const predictedLatest =
       predictionHeights[predictionHeights.length - 1];
@@ -134,14 +170,9 @@ async function loadTides() {
       (measuredLatest - predictedLatest).toFixed(2);
 
     diagnosticsDiv.innerHTML = `
-      <p><strong>Latest Predicted:</strong>
-      ${predictedLatest} ft</p>
-
-      <p><strong>Latest Observed:</strong>
-      ${measuredLatest} ft</p>
-
-      <p><strong>Residual (Observed - Predicted):</strong>
-      ${residual} ft</p>
+      <p><strong>Latest Predicted:</strong> ${predictedLatest} ft</p>
+      <p><strong>Latest Observed:</strong> ${measuredLatest} ft</p>
+      <p><strong>Residual (Observed - Predicted):</strong> ${residual} ft</p>
     `;
 
     drawChart(
@@ -152,22 +183,33 @@ async function loadTides() {
 
   } catch (err) {
     console.error(err);
-    statusDiv.textContent = "Failed to load tide data.";
+
+    if (requestId !== currentRequestId) return;
+
+    clearDisplay();
+
+    statusDiv.textContent =
+      "Failed to load tide data.";
   }
 }
 
+// ====================
+// STATIONS
+// ====================
 function populateStations() {
-  const select = document.getElementById("stationSelect");
-
   STATIONS.forEach((station) => {
     const option = document.createElement("option");
     option.value = station.id;
     option.textContent = station.name;
-    select.appendChild(option);
+    stationSelect.appendChild(option);
   });
-  select.value = "8665530";
+
+  stationSelect.value = "8665530";
 }
 
+// ====================
+// CHART
+// ====================
 function drawChart(labels, predicted, measured) {
   const ctx = document.getElementById("tideChart");
 
@@ -216,6 +258,13 @@ function drawChart(labels, predicted, measured) {
   });
 }
 
+// ====================
+// EVENTS
+// ====================
 loadBtn.addEventListener("click", loadTides);
 stationSelect.addEventListener("change", loadTides);
+
+// ====================
+// INIT
+// ====================
 populateStations();

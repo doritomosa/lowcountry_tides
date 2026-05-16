@@ -6,60 +6,66 @@
   <title>Charleston Tides</title>
 
   <link rel="stylesheet" href="css/style.css" />
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
   <div class="container">
     <h1>Charleston Tide Predictions</h1>
 
-        <label for="stationSelect">Station:</label>
+    <!-- Controls -->
+    <div class="controls">
+      <label for="stationSelect">Station:</label>
 
-          <select id="stationSelect">
+      <select id="stationSelect"></select>
 
-          </select>
-
-        <button id="loadBtn">Load Today's Tides</button>
+      <button id="loadBtn">Load Today's Tides</button>
+    </div>
 
     <div id="status"></div>
 
+    <!-- Chart -->
     <canvas id="tideChart"></canvas>
 
-<details class="dataSection">
-  <summary>Predicted Tide Data</summary>
+    <!-- Data Sections -->
+    <details class="dataSection">
+      <summary>Predicted Tide Data</summary>
 
-  <table id="predictionTable">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Predicted Height (ft)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</details>
+      <table id="predictionTable">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Predicted Height (ft)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </details>
 
-<details class="dataSection">
-  <summary>Observed Water Levels</summary>
+    <details class="dataSection">
+      <summary>Observed Water Levels</summary>
 
-  <table id="observedTable">
-    <thead>
-      <tr>
-        <th>Time</th>
-        <th>Observed Height (ft)</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</details>
+      <table id="observedTable">
+        <thead>
+          <tr>
+            <th>Time</th>
+            <th>Observed Height (ft)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </details>
 
-<details class="dataSection">
-  <summary>Diagnostics</summary>
+    <details class="dataSection">
+      <summary>Diagnostics</summary>
 
-  <div id="diagnostics">
-    No diagnostics available.
+      <div id="diagnostics">
+        No diagnostics available.
+      </div>
+    </details>
   </div>
-</details>
-  </div>
 
-<script src="js/app.js"></script></body>
+  <script src="js/app.js"></script>
+</body>
 </html>

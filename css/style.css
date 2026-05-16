@@ -2,67 +2,102 @@ body {
   font-family: Arial, sans-serif;
   background: #f4f4f4;
   margin: 0;
-  padding: 2rem;
+  padding: 1rem;
 }
 
+/* ===================== */
+/* LAYOUT */
+/* ===================== */
+
 .container {
-  max-width: 700px;
+  max-width: 800px;
   margin: auto;
   background: white;
-  padding: 2rem;
+  padding: 1.5rem;
   border-radius: 8px;
 }
 
+/* ===================== */
+/* HEADER */
+/* ===================== */
+
 h1 {
   margin-top: 0;
+  font-size: 1.5rem;
+}
+
+/* ===================== */
+/* CONTROLS */
+/* ===================== */
+
+.controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+select,
+button {
+  font-size: 1rem;
+  padding: 8px 12px;
 }
 
 button {
-  padding: 10px 16px;
-  font-size: 16px;
   cursor: pointer;
 }
+
+/* ===================== */
+/* STATUS */
+/* ===================== */
+
+#status {
+  margin: 0.5rem 0;
+  font-style: italic;
+  color: #555;
+}
+
+/* ===================== */
+/* CHART */
+/* ===================== */
+
+canvas {
+  margin-top: 1rem;
+  max-height: 320px;
+  width: 100% !important;
+}
+
+/* ===================== */
+/* TABLES */
+/* ===================== */
 
 table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 1rem;
+  font-size: 0.9rem;
 }
 
 th,
 td {
   border: 1px solid #ddd;
-  padding: 10px;
+  padding: 8px;
 }
 
 th {
   background: #efefef;
 }
 
-canvas {
-  margin-top: 2rem;
-  max-height: 400px;
-}
-
-details {
-  margin-top: 2rem;
-}
-
-summary {
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom: 1rem;
-}
-
-summary:hover {
-  opacity: 0.7;
-}
+/* ===================== */
+/* COLLAPSIBLE SECTIONS */
+/* ===================== */
 
 .dataSection {
-  margin-top: 2rem;
+  margin-top: 1.25rem;
   border: 1px solid #ddd;
   border-radius: 6px;
-  padding: 0.5rem 1rem;
+  padding: 0.5rem 0.75rem;
   background: #fafafa;
 }
 
@@ -70,12 +105,55 @@ summary {
   cursor: pointer;
   font-weight: bold;
   padding: 0.5rem 0;
+  user-select: none;
 }
 
-summary:hover {
-  opacity: 0.7;
-}
+/* ===================== */
+/* DIAGNOSTICS */
+/* ===================== */
 
 #diagnostics p {
-  margin: 0.5rem 0;
+  margin: 0.4rem 0;
+}
+
+/* ===================== */
+/* MOBILE OPTIMIZATION */
+/* ===================== */
+
+@media (max-width: 600px) {
+  body {
+    padding: 0.5rem;
+  }
+
+  .container {
+    padding: 1rem;
+    border-radius: 0;
+  }
+
+  h1 {
+    font-size: 1.25rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  select,
+  button {
+    width: 100%;
+  }
+
+  canvas {
+    max-height: 260px;
+  }
+
+  table {
+    font-size: 0.8rem;
+  }
+
+  th,
+  td {
+    padding: 6px;
+  }
 }
