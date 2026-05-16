@@ -236,6 +236,7 @@ function drawChart(labels, predicted, measured) {
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       interaction: {
         mode: "index",
         intersect: false

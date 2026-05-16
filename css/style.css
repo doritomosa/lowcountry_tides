@@ -144,8 +144,11 @@ summary {
     width: 100%;
   }
 
-  canvas {
-    max-height: 260px;
+  @media (max-width: 600px) {
+    canvas {
+      height: 420px !important;
+      max-height: 420px;
+    }
   }
 
   table {
