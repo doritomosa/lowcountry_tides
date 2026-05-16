@@ -1,4 +1,5 @@
 const loadBtn = document.getElementById("loadBtn");
+const stationSelect = document.getElementById("stationSelect");
 const tableBody = document.querySelector("#tideTable tbody");
 const statusDiv = document.getElementById("status");
 
@@ -14,51 +15,94 @@ function getTodayDate() {
   return `${year}${month}${day}`;
 }
 
-async function loadTides() {
+function clearDisplay() {
   tableBody.innerHTML = "";
+
+  if (tideChart) {
+    tideChart.destroy();
+    tideChart = null;
+  }
+}
+
+async function loadTides() {
+  clearDisplay();
   statusDiv.textContent = "Loading...";
 
   const today = getTodayDate();
+  const station = stationSelect.value;
 
-  const url =
-    `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter` +
+  const base =
+    `https://api.tidesandcurrents.noaa.gov/api/prod/datagetter`;
+
+  const predictionUrl =
+    `${base}` +
     `?product=predictions` +
     `&application=webapp` +
     `&begin_date=${today}` +
     `&end_date=${today}` +
     `&datum=MLLW` +
-    `&station=8665530` +
+    `&station=${station}` +
     `&time_zone=lst_ldt` +
     `&units=english` +
     `&interval=6` +
     `&format=json`;
 
+  const waterLevelUrl =
+    `${base}` +
+    `?product=water_level` +
+    `&application=webapp` +
+    `&begin_date=${today}` +
+    `&end_date=${today}` +
+    `&datum=MLLW` +
+    `&station=${station}` +
+    `&time_zone=lst_ldt` +
+    `&units=english` +
+    `&format=json`;
+
   try {
-    const response = await fetch(url);
-    const data = await response.json();
+    const [predictionResponse, waterLevelResponse] =
+      await Promise.all([
+        fetch(predictionUrl),
+        fetch(waterLevelUrl)
+      ]);
+
+    const predictionData = await predictionResponse.json();
+    const waterLevelData = await waterLevelResponse.json();
 
     statusDiv.textContent = "";
 
-    const labels = [];
-    const heights = [];
+    // predicted tide
+    const predictionLabels = [];
+    const predictionHeights = [];
 
-    data.predictions.forEach((prediction) => {
-      const time = prediction.t.split(" ")[1];
+    predictionData.predictions.forEach((p) => {
+      const time = p.t.split(" ")[1];
 
-      labels.push(time);
-      heights.push(parseFloat(prediction.v));
+      predictionLabels.push(time);
+      predictionHeights.push(parseFloat(p.v));
 
       const row = document.createElement("tr");
 
       row.innerHTML = `
-        <td>${prediction.t}</td>
-        <td>${prediction.v}</td>
+        <td>${p.t}</td>
+        <td>${p.v}</td>
       `;
 
       tableBody.appendChild(row);
     });
 
-    drawChart(labels, heights);
+    // actual measured water level
+    const measuredHeights = [];
+
+    waterLevelData.data.forEach((d) => {
+      measuredHeights.push(parseFloat(d.v));
+    });
+
+    drawChart(
+      predictionLabels,
+      predictionHeights,
+      measuredHeights
+    );
 
   } catch (err) {
     console.error(err);
@@ -66,10 +110,9 @@ async function loadTides() {
   }
 }
 
-function drawChart(labels, heights) {
+function drawChart(labels, predicted, measured) {
   const ctx = document.getElementById("tideChart");
 
-  // destroy old chart before drawing new one
   if (tideChart) {
     tideChart.destroy();
   }
@@ -78,14 +121,25 @@ function drawChart(labels, heights) {
     type: "line",
     data: {
       labels: labels,
-      datasets: [{
-        label: "Tide Height (ft)",
-        data: heights,
-        tension: 0.4
-      }]
+      datasets: [
+        {
+          label: "Predicted Tide",
+          data: predicted,
+          tension: 0.4
+        },
+        {
+          label: "Measured Water Level",
+          data: measured,
+          tension: 0.4
+        }
+      ]
     },
     options: {
       responsive: true,
+      interaction: {
+        mode: "index",
+        intersect: false
+      },
       scales: {
         x: {
           title: {
@@ -105,3 +159,4 @@ function drawChart(labels, heights) {
 }
 
 loadBtn.addEventListener("click", loadTides);
+stationSelect.addEventListener("change", loadTides);
