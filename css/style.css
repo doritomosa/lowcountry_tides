@@ -43,3 +43,39 @@ canvas {
   margin-top: 2rem;
   max-height: 400px;
 }
+
+details {
+  margin-top: 2rem;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+summary:hover {
+  opacity: 0.7;
+}
+
+.dataSection {
+  margin-top: 2rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  background: #fafafa;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0.5rem 0;
+}
+
+summary:hover {
+  opacity: 0.7;
+}
+
+#diagnostics p {
+  margin: 0.5rem 0;
+}

@@ -17,12 +17,12 @@
 
           <select id="stationSelect">
             <option value="8665530">Charleston Harbor, SC</option>
-            <option value="8666652">Folly Beach, SC</option>
-            <option value="8666483">Isle of Palms, SC</option>
-            <option value="8665958">Mount Pleasant, SC</option>
-            <option value="8664442">Bulls Bay, SC</option>
-            <option value="8664750">Awendaw, SC</option>
-            <option value="8667999">Beaufort, SC</option>
+            <!-- <option value="8666652">Folly Beach, SC</option> -->
+            <!-- <option value="8666483">Isle of Palms, SC</option> -->
+            <!-- <option value="8665958">Mount Pleasant, SC</option> -->
+            <!-- <option value="8664442">Bulls Bay, SC</option> -->
+            <!-- <option value="8664750">Awendaw, SC</option> -->
+            <!-- <option value="8667999">Beaufort, SC</option> -->
             <option value="8670870">Savannah, GA</option>
           </select>
 
@@ -32,15 +32,41 @@
 
     <canvas id="tideChart"></canvas>
 
-    <table id="tideTable">
-      <thead>
-        <tr>
-          <th>Time</th>
-          <th>Height (ft)</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+<details class="dataSection">
+  <summary>Predicted Tide Data</summary>
+
+  <table id="predictionTable">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Predicted Height (ft)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</details>
+
+<details class="dataSection">
+  <summary>Observed Water Levels</summary>
+
+  <table id="observedTable">
+    <thead>
+      <tr>
+        <th>Time</th>
+        <th>Observed Height (ft)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</details>
+
+<details class="dataSection">
+  <summary>Diagnostics</summary>
+
+  <div id="diagnostics">
+    No diagnostics available.
+  </div>
+</details>
   </div>
 
   <script src="app.js"></script>

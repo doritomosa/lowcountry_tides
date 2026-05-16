@@ -1,7 +1,14 @@
 const loadBtn = document.getElementById("loadBtn");
 const stationSelect = document.getElementById("stationSelect");
-const tableBody = document.querySelector("#tideTable tbody");
-const statusDiv = document.getElementById("status");
+const predictionTableBody =
+  document.querySelector("#predictionTable tbody");
+
+const observedTableBody =
+  document.querySelector("#observedTable tbody");
+
+const diagnosticsDiv =
+  document.getElementById("diagnostics");
+  const statusDiv = document.getElementById("status");
 
 let tideChart = null;
 
@@ -16,7 +23,11 @@ function getTodayDate() {
 }
 
 function clearDisplay() {
-  tableBody.innerHTML = "";
+  predictionTableBody.innerHTML = "";
+  observedTableBody.innerHTML = "";
+
+  diagnosticsDiv.innerHTML =
+    "No diagnostics available.";
 
   if (tideChart) {
     tideChart.destroy();
@@ -81,14 +92,14 @@ async function loadTides() {
       predictionLabels.push(time);
       predictionHeights.push(parseFloat(p.v));
 
-      const row = document.createElement("tr");
+    const row = document.createElement("tr");
 
-      row.innerHTML = `
-        <td>${p.t}</td>
-        <td>${p.v}</td>
-      `;
+    row.innerHTML = `
+      <td>${p.t}</td>
+      <td>${p.v}</td>
+    `;
 
-      tableBody.appendChild(row);
+    predictionTableBody.appendChild(row);
     });
 
     // actual measured water level
@@ -96,7 +107,36 @@ async function loadTides() {
 
     waterLevelData.data.forEach((d) => {
       measuredHeights.push(parseFloat(d.v));
+
+      const row = document.createElement("tr");
+
+      row.innerHTML = `
+        <td>${d.t}</td>
+        <td>${d.v}</td>
+      `;
+
+      observedTableBody.appendChild(row);
     });
+
+    const predictedLatest =
+      predictionHeights[predictionHeights.length - 1];
+
+    const measuredLatest =
+      measuredHeights[measuredHeights.length - 1];
+
+    const residual =
+      (measuredLatest - predictedLatest).toFixed(2);
+
+    diagnosticsDiv.innerHTML = `
+      <p><strong>Latest Predicted:</strong>
+      ${predictedLatest} ft</p>
+
+      <p><strong>Latest Observed:</strong>
+      ${measuredLatest} ft</p>
+
+      <p><strong>Residual (Observed - Predicted):</strong>
+      ${residual} ft</p>
+    `;
 
     drawChart(
       predictionLabels,
