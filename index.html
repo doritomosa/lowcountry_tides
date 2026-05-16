@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tide Monitor</title>
+    <!-- iOS Home Screen Capability -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <style>
+        :root { --bg: #121212; --card: #1e1e1e; --text: #e0e0e0; --accent: #4caf50; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3); width: 100%; max-width: 350px; box-sizing: border-box; }
+        h1 { font-size: 1.5rem; margin-top: 0; text-align: center; }
+        label { display: block; margin: 10px 0 5px; font-size: 0.9rem; color: #aaa; }
+        input, select, button { width: 100%; padding: 12px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #333; background: #2a2a2a; color: #fff; font-size: 1rem; box-sizing: border-box; }
+        button { background: var(--accent); border: none; font-weight: bold; cursor: pointer; margin-bottom: 0; }
+        #output { margin-top: 20px; width: 100%; max-width: 350px; }
+        .data-point { background: var(--card); padding: 12px; border-radius: 8px; margin-bottom: 8px; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; }
+        .time { font-size: 0.85rem; color: #aaa; }
+        .val { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h1>NOAA Tide Monitor</h1>
+        <label for="station">Station ID</label>
+        <input type="text" id="station" value="8665530" placeholder="e.g., 8665530">
+
+        <label for="datum">Datum</label>
+        <select id="datum">
+            <option value="MLLW">MLLW</option>
+            <option value="MHW">MHW</option>
+        </select>
+
+        <button onclick="fetchTides()">Get Recent Data</button>
+    </div>
+
+    <div id="output"></div>
+
+    <script>
+        async function fetchTides() {
+            const station = document.getElementById('station').value;
+            const datum = document.getElementById('datum').value;
+            const outputDiv = document.getElementById('output');
+            outputDiv.innerHTML = 'Loading...';
+
+            // Calculate dates for past 24 hours
+            const now = new Date();
+            const past = new Date(now.getTime() - (24 * 60 * 60 * 1000));
+            
+            const formatDate = (d) => d.toISOString().slice(0,10).replace(/-/g, '');
+            const begin = formatDate(past);
+            const end = formatDate(now);
+
+            const url = `https://noaa.gov{begin}&end_date=${end}&datum=${datum}&station=${station}&units=english&time_zone=lst_ldt&application=MobileHTMLApp&format=json`;
+
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (!data.data) throw new Error(data.error?.message || 'No data found');
+                
+                outputDiv.innerHTML = '';
+                // Show the 5 most recent observations
+                data.data.slice(-5).reverse().forEach(obs => {
+                    const item = document.createElement('div');
+                    item.className = 'data-point';
+                    item.innerHTML = `
+                        <span class="time">${obs.t}</span>
+                        <span class="val">${obs.v} ft</span>
+                    `;
+                    outputDiv.appendChild(item);
+                });
+            } catch (err) {
+                outputDiv.innerHTML = `<div class="card" style="border-left: 4px solid #f44336;">Error: ${err.message}</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
