@@ -127,10 +127,12 @@ async function loadTides() {
       predictionHeights.push(parseFloat(p.v));
 
       const row = document.createElement("tr");
+
       row.innerHTML = `
         <td>${p.t}</td>
         <td>${p.v}</td>
       `;
+
       predictionTableBody.appendChild(row);
     });
 
@@ -141,10 +143,12 @@ async function loadTides() {
       measuredHeights.push(parseFloat(d.v));
 
       const row = document.createElement("tr");
+
       row.innerHTML = `
         <td>${d.t}</td>
         <td>${d.v}</td>
       `;
+
       observedTableBody.appendChild(row);
     });
 
@@ -157,6 +161,7 @@ async function loadTides() {
     ) {
       diagnosticsDiv.innerHTML =
         "<p>No diagnostics available.</p>";
+
       return;
     }
 
@@ -171,7 +176,9 @@ async function loadTides() {
 
     diagnosticsDiv.innerHTML = `
       <p><strong>Latest Predicted:</strong> ${predictedLatest} ft</p>
+
       <p><strong>Latest Observed:</strong> ${measuredLatest} ft</p>
+
       <p><strong>Residual (Observed - Predicted):</strong> ${residual} ft</p>
     `;
 
@@ -199,8 +206,10 @@ async function loadTides() {
 function populateStations() {
   STATIONS.forEach((station) => {
     const option = document.createElement("option");
+
     option.value = station.id;
     option.textContent = station.name;
+
     stationSelect.appendChild(option);
   });
 
@@ -219,8 +228,10 @@ function drawChart(labels, predicted, measured) {
 
   tideChart = new Chart(ctx, {
     type: "line",
+
     data: {
       labels: labels,
+
       datasets: [
         {
           label: "Predicted Tide",
@@ -234,13 +245,31 @@ function drawChart(labels, predicted, measured) {
         }
       ]
     },
+
     options: {
       responsive: true,
       maintainAspectRatio: false,
+
       interaction: {
-        mode: "index",
+        mode: "nearest",
+        axis: "x",
         intersect: false
       },
+
+      plugins: {
+        tooltip: {
+          mode: "nearest",
+          axis: "x",
+          intersect: false
+        }
+      },
+
+      hover: {
+        mode: "nearest",
+        axis: "x",
+        intersect: false
+      },
+
       scales: {
         x: {
           title: {
@@ -248,6 +277,7 @@ function drawChart(labels, predicted, measured) {
             text: "Time"
           }
         },
+
         y: {
           title: {
             display: true,
@@ -263,6 +293,7 @@ function drawChart(labels, predicted, measured) {
 // EVENTS
 // ====================
 loadBtn.addEventListener("click", loadTides);
+
 stationSelect.addEventListener("change", loadTides);
 
 // ====================
