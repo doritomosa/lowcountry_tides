@@ -166,7 +166,7 @@ async function loadTides() {
     }
 
     const predictedLatest =
-      predictionHeights[predictionHeights.length - 1];
+      predictionHeights[measuredHeights.length - 1];
 
     const measuredLatest =
       measuredHeights[measuredHeights.length - 1];
@@ -175,11 +175,12 @@ async function loadTides() {
       (measuredLatest - predictedLatest).toFixed(2);
 
     diagnosticsDiv.innerHTML = `
-      <p><strong>Latest Predicted:</strong> ${predictedLatest} ft</p>
 
       <p><strong>Latest Observed:</strong> ${measuredLatest} ft</p>
 
-      <p><strong>Residual (Observed - Predicted):</strong> ${residual} ft</p>
+      <p><strong>Latest Predicted:</strong> ${predictedLatest} ft</p>
+
+      <p><strong>Observed - Predicted:</strong> ${residual} ft</p>
     `;
 
     drawChart(
